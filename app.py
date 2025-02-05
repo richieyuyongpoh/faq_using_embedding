@@ -40,7 +40,7 @@ def find_best_answer(user_question):
 # Streamlit Interface
 st.title("Smart FAQ Assistant (Heart, Lung, Blood Health)")
 
-user_question = st.text_input("Enter your question about heart, lung, or blood health:")
+user_question = st.text_input("Who will have Cardiomyopathy?")
 search_button = st.button("Find Answer")
 
 if search_button:
