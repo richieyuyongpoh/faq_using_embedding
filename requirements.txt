@@ -3,4 +3,4 @@ matplotlib
 scipy
 openai==0.28
 plotly
-sklearn
+scikit-learn
