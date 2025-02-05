@@ -8,43 +8,30 @@ import openai
 # Set your OpenAI API key
 openai.api_key = st.secrets["mykey"] 
 
-# Load Data & Embeddings
-try:
-    df = pd.read_csv("qa_dataset_with_embeddings.csv")
-    # Convert string embeddings to numpy arrays
-    df['Question_Embedding'] = df['Question_Embedding'].apply(ast.literal_eval)
-except FileNotFoundError:
-    st.error("qa_dataset_with_embeddings.csv not found. Please upload the file.")
-    st.stop() # Stop execution if file not found
+df = pd.read_csv("qa_dataset_with_embeddings.csv")
 
+# Convert the string embeddings back to lists
+df['Question_Embedding'] = df['Question_Embedding'].apply(ast.literal_eval)
 
-# Embedding Model (using OpenAI's text-embedding-ada-002)
-def get_embedding(text, model="text-embedding-ada-002"):
-    try:
-        embedding = openai.Embedding.create(input=[text], model=model)['data'][0]['embedding']
-        return embedding
-    except Exception as e:
-        st.error(f"Error generating embedding: {e}")
-        return None
+def find_best_answer(user_question):
+   # Get embedding for the user's question
+   user_question_embedding = get_embedding(user_question)
 
-# Question Answering Logic
-def find_best_answer(user_question, df):
-    user_question_embedding = get_embedding(user_question)
+   # Calculate cosine similarities for all questions in the dataset
+   df['Similarity'] = df['Question_Embedding'].apply(lambda x: cosine_similarity(x, user_question_embedding))
 
-    if user_question_embedding is None: # Handle embedding generation errors
-        return "Error processing your question. Please try again."
+   # Find the most similar question and get its corresponding answer
+   most_similar_index = df['Similarity'].idxmax()
+   max_similarity = df['Similarity'].max()
 
-    df['Similarity'] = df['Question_Embedding'].apply(lambda x: cosine_similarity(x, user_question_embedding))
+   # Set a similarity threshold to determine if a question is relevant enough
+   similarity_threshold = 0.6  # You can adjust this value
 
-    most_similar_index = df['Similarity'].idxmax()
-    max_similarity = df['Similarity'].max()
-
-    similarity_threshold = 0.6  # Adjust as needed
-    if max_similarity >= similarity_threshold:
-        best_answer = df.loc[most_similar_index, 'Answer']
-        return best_answer
-    else:
-        return "I apologize, but I don't have information on that topic yet. Could you please ask other questions?"
+   if max_similarity >= similarity_threshold:
+      best_answer = df.loc[most_similar_index, 'Answer']
+      return best_answer
+   else:
+      return "I apologize, but I don't have information on that topic yet. Could you please ask other questions?"
 
 
 # Streamlit Interface
@@ -58,17 +45,7 @@ if search_button:
         st.warning("Please enter a question.")
     else:
         with st.spinner("Searching for the best answer..."):  # Display a spinner while searching
-            answer = find_best_answer(user_question, df)
+            answer = find_best_answer(user_question)
             st.write("## Answer:")
             st.write(answer)
 
-
-# File uploader (Optional - if you want users to upload the CSV)
-uploaded_file = st.file_uploader("Upload your CSV file (qa_dataset_with_embeddings.csv)", type="csv")
-if uploaded_file is not None:
-    try:
-      df = pd.read_csv(uploaded_file)
-      df['Question_Embedding'] = df['Question_Embedding'].apply(ast.literal_eval).apply(np.array)
-      st.success("File uploaded and processed successfully!")
-    except Exception as e:
-      st.error(f"Error processing uploaded file: {e}")
