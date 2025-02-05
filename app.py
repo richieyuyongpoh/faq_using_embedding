@@ -12,7 +12,7 @@ openai.api_key = st.secrets["mykey"]
 try:
     df = pd.read_csv("qa_dataset_with_embeddings.csv")
     # Convert string embeddings to numpy arrays
-    df['Question_Embedding'] = df['Question_Embedding'].apply(ast.literal_eval).apply(np.array)
+    df['Question_Embedding'] = df['Question_Embedding'].apply(ast.literal_eval)
 except FileNotFoundError:
     st.error("qa_dataset_with_embeddings.csv not found. Please upload the file.")
     st.stop() # Stop execution if file not found
@@ -22,7 +22,7 @@ except FileNotFoundError:
 def get_embedding(text, model="text-embedding-ada-002"):
     try:
         embedding = openai.Embedding.create(input=[text], model=model)['data'][0]['embedding']
-        return np.array(embedding) # Return as numpy array
+        return embedding
     except Exception as e:
         st.error(f"Error generating embedding: {e}")
         return None
