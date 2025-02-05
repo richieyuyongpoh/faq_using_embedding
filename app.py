@@ -27,7 +27,7 @@ def find_best_answer(user_question):
    max_similarity = df['Similarity'].max()
 
    # Set a similarity threshold to determine if a question is relevant enough
-   similarity_threshold = 0.6  # You can adjust this value
+   similarity_threshold = 0.75  # You can adjust this value
 
    if max_similarity >= similarity_threshold:
       best_answer = df.loc[most_similar_index, 'Answer']
