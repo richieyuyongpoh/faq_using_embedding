@@ -8,7 +8,7 @@ import openai
 openai.api_key = st.secrets["mykey"] 
 
 df = pd.read_csv("qa_dataset_with_embeddings.csv")
-st.write(df.describe())
+
 
 # Convert the string embeddings back to lists
 df['Question_Embedding'] = df['Question_Embedding'].apply(ast.literal_eval)
@@ -40,7 +40,7 @@ def find_best_answer(user_question):
 # Streamlit Interface
 st.title("Smart FAQ Assistant (Heart, Lung, Blood Health)")
 
-user_question = st.text_input("Who will have Cardiomyopathy?")
+user_question = st.text_input("Ask a question","Who will have Cardiomyopathy?")
 search_button = st.button("Find Answer")
 
 if search_button:
