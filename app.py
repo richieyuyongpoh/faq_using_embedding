@@ -9,7 +9,6 @@ openai.api_key = st.secrets["mykey"]
 
 df = pd.read_csv("qa_dataset_with_embeddings.csv")
 
-
 # Convert the string embeddings back to lists
 df['Question_Embedding'] = df['Question_Embedding'].apply(ast.literal_eval)
 
