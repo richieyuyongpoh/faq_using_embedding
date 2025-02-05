@@ -6,7 +6,7 @@ from openai.embeddings_utils import cosine_similarity
 import openai
 
 # Set your OpenAI API key
-openai.api_key = "YOUR_OPENAI_API_KEY"  # Replace with your actual key
+openai.api_key = st.secrets["mykey"] 
 
 # Load Data & Embeddings
 try:
